@@ -22,7 +22,7 @@ const handler = createMcpHandler((server) => {
     async () => ok(await listMetrics(getDb())));
 
   server.registerTool("query_metric",
-    { title: "Query a metric", description: "Query a metric over a date range. aggregation: raw|hourly|daily|avg|sum|min|max.",
+    { title: "Query a metric", description: "Query a metric over a date range. aggregation: raw|hourly|daily|avg|sum|min|max. Use raw for sleep_analysis: sleep totals, stages and times are in each point extra; source identifies the device and units supplies the unit. Scalar aggregations use qty/avg and do not aggregate sleep details.",
       inputSchema: { name: z.string(), start: z.string(), end: z.string(),
         aggregation: z.enum(["raw", "hourly", "daily", "avg", "sum", "min", "max"]).default("daily") } },
     async (a) => ok(await queryMetric(getDb(), a)));
