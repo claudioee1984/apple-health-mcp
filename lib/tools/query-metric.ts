@@ -24,7 +24,7 @@ export async function queryMetric(db: any, args: QueryMetricArgs) {
 
   if (aggregation === "raw") {
     const points = await db
-      .select({ date: metricSamples.date, qty: metricSamples.qty, min: metricSamples.min, avg: metricSamples.avg, max: metricSamples.max, systolic: metricSamples.systolic, diastolic: metricSamples.diastolic })
+      .select({ date: metricSampdate: metricSamples.date, source: metricSamples.source, units: metricSamples.units, extra: metricSamples.extra, qty: metricSamples.qtyples.min, avg: metricSamples.avg, max: metricSamples.max, systolic: metricSamples.systolic, diastolic: metricSamples.diastolic })
       .from(metricSamples).where(range).orderBy(asc(metricSamples.date));
     return { name, aggregation, points };
   }
