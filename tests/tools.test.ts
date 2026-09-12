@@ -57,3 +57,19 @@ describe("tools", () => {
     expect(rows[0].payload).toMatchObject({ classification: "Sinus Rhythm" });
   });
 });
+
+it("query_metric raw preserves sleep stages, times and device provenance", async () => {
+  const { metricSamples } = await import("@/db/schema");
+  const db = await makeTestDb();
+  const extra = { totalSleep: 7.1, rem: 1.75, core: 4.1, deep: 1.25, awake: 0.025, sleepStart: "2026-09-09 22:40:55 -0300", sleepEnd: "2026-09-10 05:48:28 -0300" };
+  await db.insert(metricSamples).values([
+    { metricName: "sleep_analysis", date: new Date("2026-09-10T03:00:00Z"), units: "hr", source: "Apple Watch", extra },
+    { metricName: "sleep_analysis", date: new Date("2026-09-10T03:00:00Z"), units: "hr", source: "Oura", extra: { totalSleep: 6.75 } },
+  ]);
+  const r = await queryMetric(db, { name: "sleep_analysis", start: "2026-09-10T00:00:00-03:00", end: "2026-09-11T00:00:00-03:00", aggregation: "raw" });
+  expect(r.points).toHaveLength(2);
+  expect(r.points).toEqual(expect.arrayContaining([
+    expect.objectContaining({ source: "Apple Watch", units: "hr", qty: null, extra }),
+    expect.objectContaining({ source: "Oura", extra: { totalSleep: 6.75 } }),
+  ]));
+});
